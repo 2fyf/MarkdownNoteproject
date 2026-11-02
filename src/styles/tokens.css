@@ -1,0 +1,290 @@
+/* ─────────────────────────── Design tokens ───────────────────────────
+   The single source of truth for every visual decision. Components read
+   ONLY from here — a raw hex or rgba() in a component is a bug, because
+   the next component then has to guess the same value again (which is how
+   we ended up with 16 different border radii and four different reds).
+
+   Layout of this file:
+     1. surfaces      2. lines        3. ink          4. semantic roles
+     5. elevation     6. radius       7. type         8. spacing
+     9. motion
+
+   ── Why elevation is mostly a 1px ring ──
+   On a dark canvas a drop shadow is nearly invisible: `0 2px 6px #0003`
+   over `#1c1d20` moves the pixels by a couple of luminance points. What
+   actually separates a panel from the page is the hairline ring in the
+   first shadow slot. The blur layers are there for the few surfaces that
+   float high enough to catch it (menus, modals) — never rely on them
+   alone to make an edge readable. */
+
+:root {
+  /* Course-specific surfaces. Both palettes live here with the shared tokens. */
+  --course-canvas: #11151c;
+  --course-rail: #161b24;
+  --course-paper: #1c222d;
+  --course-card: #222b38;
+  --course-menu: #252f3d;
+  --course-border: #303c4b;
+  --course-border-strong: #45566c;
+  --course-text: #e8edf5;
+  --course-text-secondary: #b7c3d5;
+  --course-text-muted: #91a2b8;
+  --course-blue: #80afff;
+  --course-blue-text: #accbff;
+  --course-blue-wash: rgba(128, 175, 255, 0.13);
+  --course-on-blue: #101b2f;
+  --course-selected: #293a53;
+  --course-hover: rgba(174, 202, 247, 0.07);
+  /* ── 1. Surfaces — elevation order, higher index = nearer the viewer ── */
+  --surface-0: #17181b; /* page floor */
+  --surface-1: #1c1d20; /* pane */
+  --surface-2: #232427; /* card */
+  --surface-3: #2a2b2e; /* floating: sidebar, menu, modal */
+  --surface-inset: #1f2022; /* recessed: code blocks, read-only wells */
+  --surface-field: #2b2c2f; /* form control bed */
+
+  /* Interaction states are alpha washes, not opaque greys: a row keeps its
+     own surface's tint whether it sits on the page or inside a menu.
+     `--surface-wash` is the resting state of a translucent block — a chip bed,
+     an inset field — which is why it is separate from the hover ramp. */
+  --surface-wash: rgba(255, 255, 255, 0.03);
+  --surface-hover: rgba(255, 255, 255, 0.045);
+  --surface-hover-strong: rgba(255, 255, 255, 0.075);
+  --surface-active: rgba(255, 255, 255, 0.1);
+
+  /* The app-wide scrollbar thumb. A token because the wash direction flips with
+     the theme — white-on-dark is invisible on a light canvas. */
+  --scrollbar-thumb: var(--surface-active);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.22);
+  --scrollbar-thumb-active: rgba(255, 255, 255, 0.34);
+
+  /* Behind modals and backdrops. */
+  --scrim: rgba(0, 0, 0, 0.45);
+
+  /* Chrome that floats over document content — the selection toolbar on a PDF
+     page, the translation popover. Nearly opaque rather than fully so, because
+     the page underneath should still register as being there. It cannot be
+     --surface-3: that is opaque and would read as a hole punched in the page. */
+  --surface-float: rgba(24, 28, 34, 0.94);
+
+  /* ── 2. Lines — two weights. `--line` divides, `--line-strong` encloses. ── */
+  --line: #2e3033;
+  --line-strong: #3a3c40;
+
+  /* ── 3. Ink ── */
+  --ink: #f2f3f4;
+  --ink-2: #a5a8ad;
+  --ink-3: #6c6f75;
+
+  /* ── 4. Semantic roles — each ships with a tint so nobody hand-mixes a
+         background for it. Reach for a role before reaching for a hex. ── */
+  --accent: #4b9dff;
+  --accent-ink: #8cc4ff; /* accent text on a dark bed; the raw accent is too dim */
+  --accent-tint: rgba(75, 157, 255, 0.16);
+  --success: #3dbb72;
+  --success-tint: rgba(61, 187, 114, 0.16);
+  --warning: #f68f3c;
+  --warning-tint: rgba(246, 143, 60, 0.16);
+  --danger: #ee5c61;
+  --danger-tint: rgba(238, 92, 97, 0.16);
+
+  /* Foreground for text sitting ON a saturated role fill — the filled chip, an
+     accent button. Always the far end from the fills, which is why one token
+     covers all four roles. It is NOT --surface-0: that reads as light grey in
+     the light theme and costs about half a point of contrast, which is exactly
+     enough to drop three of the four fills under AA. */
+  --on-fill: var(--surface-0);
+
+  /* Role-colored borders. A solid role hex is too loud for a 1px edge, and
+     every component that needed one was mixing its own alpha. */
+  --accent-line: rgba(75, 157, 255, 0.42);
+  --success-line: rgba(61, 187, 114, 0.42);
+  --warning-line: rgba(246, 143, 60, 0.42);
+  --danger-line: rgba(238, 92, 97, 0.42);
+
+  /* ── 5. Elevation — see the note at the top of this file. ── */
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-raised: 0 0 0 1px var(--line), 0 2px 10px rgba(0, 0, 0, 0.22);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-overlay: 0 0 0 1px var(--line-strong), 0 8px 28px rgba(0, 0, 0, 0.34);
+  --shadow-field: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  /* A sheet of paper over the canvas — the PDF page, a rendered translation
+     page. The one place a deep blur genuinely reads on this background, because
+     the surface above it is near-white. */
+  --shadow-page: 0 20px 50px rgba(0, 0, 0, 0.3);
+  --ring-focus: 0 0 0 1px var(--accent), 0 0 0 4px var(--accent-tint);
+
+  /* ── 6. Radius — `--r-sm` is the default. Anything that isn't a pill and
+         isn't a large card should use it. ── */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px; /* modals and full-stage cards only */
+  --r-pill: 999px;
+
+  /* ── 7. Type ──
+     Sizes match what the UI already shipped — that scale was never the
+     problem, so it is preserved verbatim rather than "cleaned up".
+
+     Weight is where this app went wrong: 44 declarations sat at 700+, and
+     three of them (650/750/760) render as real weights under SF Pro on
+     macOS but round to 700 under Segoe UI on Windows, so the same screen
+     had different weights per platform. Three weights, no more.
+
+     There is deliberately NO negative tracking token. Tightening Latin UI
+     text is a real refinement, but it cannot be scoped by CSS selector here:
+     this app's chrome is itself bilingual — a button reads "Send" or "发送"
+     depending on locale — and PingFang's Han glyphs are full-width squares
+     that only get cramped when pulled together. SF Pro already applies
+     optical tracking on macOS, so the gain was small and the risk was not.
+
+     `--tracking-caps` is the one tracking we do want: uppercase micro-labels
+     need opening up, not closing in. It replaced four hand-picked values
+     (0.08 / 0.06 / 0.04 / 0.03em) that were all doing the same job. */
+  --font-sans: 'SF Pro Text', 'SF Pro Display', 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    monospace;
+
+  --fs-micro: 10px;
+  --fs-caption: 11px;
+  --fs-body: 12px;
+  --fs-body-lg: 13px;
+  --fs-title: 15px;
+  --fs-hero: 21px;
+
+  --w-normal: 400;
+  --w-medium: 500;
+  --w-strong: 600;
+
+  --tracking-caps: 0.08em;
+  --lh-tight: 1.35;
+  --lh-body: 1.55;
+
+  /* ── 8. Spacing ── */
+  --gap-1: 4px;
+  --gap-2: 6px;
+  --gap-3: 8px;
+  --gap-4: 12px;
+  --gap-5: 16px;
+  --gap-6: 24px;
+
+  /* ── 9. Motion — one duration vocabulary. The codebase had 25 distinct
+         transition declarations writing the same value as both `140ms` and
+         `0.14s`, which is why nothing felt like it moved together. ── */
+  --dur-fast: 120ms;
+  --dur-base: 160ms;
+  --dur-slow: 220ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ──────────────────────────── Light theme ────────────────────────────
+   Dark is the base above; this block only redefines what actually changes.
+   Sizes, weights, radii, durations and the two composed tokens
+   (--shadow-hairline, --ring-focus, which are built from --line and --accent)
+   are theme-independent and are deliberately absent here.
+
+   `src/theme.js` always writes an explicit data-theme, resolving "system" at
+   runtime, so there is no `@media (prefers-color-scheme)` branch to keep in
+   sync with this one.
+
+   Three things are NOT a mechanical inversion, and they are where a naive
+   light theme falls apart:
+
+   1. The interaction washes flip polarity. White at 4.5% over a white card is
+      literally nothing; light mode needs a black wash, at a lower alpha,
+      because black over white bites harder than white over near-black.
+
+   2. Elevation changes its center of gravity. On the dark canvas the blur is
+      nearly invisible and the 1px ring does all the work (see the note at the
+      top of this file). Here the blur is finally readable, so the shadows get
+      real spread — the ring stays, but it is no longer carrying the edge alone.
+
+   3. --accent-ink inverts its relationship to --accent. On a dark bed it is
+      the *lighter* of the two so accent text lifts off the surface; on white
+      it has to be the *darker*, or the text fails contrast. Every role color
+      is re-picked rather than reused: the dark palette is tuned for luminance
+      against near-black and washes out on white. */
+:root[data-theme='light'] {
+  --course-canvas: #f1f4f9;
+  --course-rail: #f7f9fc;
+  --course-paper: #ffffff;
+  --course-card: #f4f7fc;
+  --course-menu: #ffffff;
+  --course-border: #e1e7f0;
+  --course-border-strong: #c8d4e5;
+  --course-text: #1e2c43;
+  --course-text-secondary: #52627b;
+  --course-text-muted: #667892;
+  --course-blue: #346bd8;
+  --course-blue-text: #2857b5;
+  --course-blue-wash: rgba(52, 107, 216, 0.09);
+  --course-on-blue: #ffffff;
+  --course-selected: #e9f0ff;
+  --course-hover: rgba(52, 107, 216, 0.055);
+  /* Elevation runs the other way here: the page is the greyest plane and
+     floating chrome is pure white, separated by shadow rather than by tone. */
+  --surface-0: #f1f2f3;
+  --surface-1: #fafafb;
+  --surface-2: #ffffff;
+  --surface-3: #ffffff;
+  --surface-inset: #f2f3f5;
+  --surface-field: #f2f2f3;
+
+  --surface-wash: rgba(16, 24, 40, 0.02);
+  --surface-hover: rgba(16, 24, 40, 0.04);
+  --surface-hover-strong: rgba(16, 24, 40, 0.07);
+  --surface-active: rgba(16, 24, 40, 0.1);
+
+  --scrollbar-thumb: rgba(16, 24, 40, 0.16);
+  --scrollbar-thumb-hover: rgba(16, 24, 40, 0.28);
+  --scrollbar-thumb-active: rgba(16, 24, 40, 0.4);
+
+  /* A modal scrim stays dark in both themes — it exists to push the page back,
+     and a white veil would wash it out instead. */
+  --scrim: rgba(16, 24, 40, 0.35);
+  /* Chrome floating over document content, near-opaque so the page still
+     registers underneath. */
+  --surface-float: rgba(255, 255, 255, 0.96);
+
+  --line: #e6e8ea;
+  --line-strong: #d5d8dc;
+
+  --ink: #1f2124;
+  --ink-2: #5c6068;
+  --ink-3: #8b8f97;
+
+  /* Deeper than the obvious light-mode blue. Seventeen places set
+     `color: var(--accent)` on 11–13px text, and a brighter blue measures 3.91
+     against white — under AA, with no large-text exemption at this size. This
+     lands at 4.99 as text and 4.99 under white when used as a fill. */
+  --accent: #0d6fd1;
+  --accent-ink: #0a63bd;
+  --accent-tint: rgba(13, 111, 209, 0.1);
+
+  --on-fill: #ffffff;
+  --success: #12854a;
+  --success-tint: rgba(18, 133, 74, 0.1);
+  --warning: #b45f06;
+  --warning-tint: rgba(180, 95, 6, 0.1);
+  --danger: #cf2f36;
+  --danger-tint: rgba(207, 47, 54, 0.1);
+
+  --accent-line: rgba(13, 111, 209, 0.35);
+  --success-line: rgba(18, 133, 74, 0.35);
+  --warning-line: rgba(180, 95, 6, 0.35);
+  --danger-line: rgba(207, 47, 54, 0.35);
+
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(16, 24, 40, 0.05),
+    0 2px 6px rgba(16, 24, 40, 0.04);
+  --shadow-raised: 0 0 0 1px var(--line), 0 2px 10px rgba(16, 24, 40, 0.06);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-overlay: 0 0 0 1px var(--line-strong), 0 8px 28px rgba(16, 24, 40, 0.1);
+  --shadow-field: inset 0 1px 2px rgba(16, 24, 40, 0.06);
+  /* The page still floats over the canvas, but a paper-on-paper drop needs far
+     less ink than paper-on-charcoal did. */
+  --shadow-page: 0 12px 32px rgba(16, 24, 40, 0.1);
+}

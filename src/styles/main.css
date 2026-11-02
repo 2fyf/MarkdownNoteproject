@@ -1,0 +1,97 @@
+/* Every color, radius, duration and weight lives in tokens.css. This file is
+   only the app-wide element defaults that sit on top of them. */
+@import './tokens.css';
+
+/* color-scheme is not decoration: it decides how the platform paints native
+   <select> popups, form controls and the default scrollbar. It has to follow
+   the theme or a light window still drops a black menu. */
+:root {
+  color-scheme: dark;
+  font-family: var(--font-sans);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  height: 100%;
+  background: var(--surface-0);
+}
+
+body {
+  color: var(--ink);
+}
+
+button,
+input,
+select {
+  font: inherit;
+  /* color-scheme alone isn't enough for the native <option> popup on Windows
+     (WebView2), especially when the <select> background is transparent — the
+     popup renders white. Pin the scheme on the control too, and the `option`
+     rule below pins explicit colors, so the dropdown list matches on every
+     platform in both themes. */
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] button,
+:root[data-theme='light'] input,
+:root[data-theme='light'] select {
+  color-scheme: light;
+}
+
+option {
+  background-color: var(--surface-1);
+  color: var(--ink);
+}
+
+/* ───────────────────────────── Scrollbars ─────────────────────────────
+   ONE app-wide scrollbar style — the single source of truth. Every scroll
+   container (sidebar tree, chat list, reader, trending feed, popovers, modals)
+   inherits this; components should NOT define their own ::-webkit-scrollbar
+   rules. Slim transparent track + a floating thumb (transparent border +
+   padding-box clip shrinks the visible bar) that stays hidden until the
+   container is hovered or actively scrolling.
+
+   The thumb is always faintly visible (so it's clear a region can scroll) and
+   deepens on hover / while actively scrolling. `.is-scrolling` is a generic
+   class toggled by JS during a scroll (PdfViewer / ChatPane / ReaderPane).
+
+   NOTE: never set `scrollbar-width` / `scrollbar-color` — when those standard
+   properties are present, WebKit (WKWebView, our runtime) ignores these
+   ::-webkit-scrollbar rules entirely and falls back to a native scrollbar. */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: var(--r-pill);
+  background-color: var(--scrollbar-thumb);
+  background-clip: padding-box;
+}
+
+:hover::-webkit-scrollbar-thumb,
+.is-scrolling::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-active);
+  background-clip: padding-box;
+}

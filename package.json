@@ -1,0 +1,37 @@
+{
+  "name": "markdownnote",
+  "version": "0.3.0",
+  "private": true,
+  "license": "AGPL-3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "test:unit": "node --test --test-concurrency=1 \"src/**/*.test.js\"",
+    "check:design-tokens": "node scripts/check-design-tokens.mjs",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "node scripts/tauri-dev.mjs",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.10.4",
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/state": "^6.7.0",
+    "@codemirror/view": "^6.43.3",
+    "@tauri-apps/api": "^2.10.1",
+    "@vscode/markdown-it-katex": "^1.1.2",
+    "dompurify": "^3.4.11",
+    "katex": "^0.17.0",
+    "markdown-it": "^14.1.1",
+    "markdown-it-link-attributes": "^4.0.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@tauri-apps/cli": "^2.10.1",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.3.5"
+  }
+}
