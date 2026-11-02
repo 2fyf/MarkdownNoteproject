@@ -43,3 +43,13 @@ cargo build --locked --manifest-path src-tauri/Cargo.toml --bin markdownnote --f
 ## 许可
 
 许可见 LICENSE，原作者署名见 NOTICE；第三方组件说明见 `文档/开源许可/第三方许可.md`。本项目保留适用的 AGPL-3.0 义务。
+
+## Windows 安装包
+
+编译 EXE 并安装 NSIS 后，提交源码，再运行：
+
+```powershell
+python tools/build-windows-package.py --exe src-tauri/target/debug/markdownnote.exe --nsis ../开发环境/tools/nsis/nsis-3.11/makensis.exe --output ../开发环境/交付/新版本 --date 2026-11-02
+```
+
+`--exe` 和 `--nsis` 可改为本机对应路径。输出须位于工程同级的独立子目录且为空。安装内容只包含程序、使用说明、完整许可证和原作者署名；源码归档固定到当前 Git 提交。打包脚本不附带 WebView2。
